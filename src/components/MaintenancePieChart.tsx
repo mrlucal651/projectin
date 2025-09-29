@@ -23,7 +23,7 @@ const MaintenancePieChart: React.FC = () => {
   const fetchMaintenanceStatus = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8080/api/vehicles/maintenance-status');
+      const response = await fetch('/api/vehicles/maintenance-status');
       if (!response.ok) {
         throw new Error('Failed to fetch maintenance status');
       }
