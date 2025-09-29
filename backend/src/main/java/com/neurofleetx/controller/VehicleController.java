@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -90,6 +91,35 @@ public class VehicleController {
             "maintenance", vehicleService.getVehicleCountByStatus(Vehicle.VehicleStatus.MAINTENANCE)
         );
         return ResponseEntity.ok(stats);
+    }
+
+    @GetMapping("/maintenance-status")
+    public ResponseEntity<Map<String, Integer>> getMaintenanceStatus() {
+        List<Vehicle> allVehicles = vehicleService.getAllVehicles();
+        
+        Map<String, Integer> maintenanceStatus = new HashMap<>();
+        int healthy = 0;
+        int due = 0;
+        int critical = 0;
+        
+        for (Vehicle vehicle : allVehicles) {
+            // Simulate maintenance status based on vehicle status and battery level
+            if (vehicle.getStatus() == Vehicle.VehicleStatus.MAINTENANCE) {
+                critical++;
+            } else if (vehicle.getBatteryLevel() != null && vehicle.getBatteryLevel() < 30) {
+                due++;
+            } else if (vehicle.getStatus() == Vehicle.VehicleStatus.OFFLINE) {
+                due++;
+            } else {
+                healthy++;
+            }
+        }
+        
+        maintenanceStatus.put("healthy", healthy);
+        maintenanceStatus.put("due", due);
+        maintenanceStatus.put("critical", critical);
+        
+        return ResponseEntity.ok(maintenanceStatus);
     }
 
     @DeleteMapping("/{id}")

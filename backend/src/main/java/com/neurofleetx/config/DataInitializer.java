@@ -119,10 +119,40 @@ public class DataInitializer implements CommandLineRunner {
         electric1.setCapacity(1200);
         electric1.setIsElectric(true);
 
+        // Add more vehicles for better maintenance status distribution
+        Vehicle maintenance1 = new Vehicle("FL-005", "Cargo Truck", "Tata LPT", 
+                                         Vehicle.VehicleStatus.MAINTENANCE, 28.7041, 77.1025);
+        maintenance1.setCurrentLocation("Delhi Service Center");
+        maintenance1.setBatteryLevel(0);
+        maintenance1.setSpeed(0.0);
+        maintenance1.setDriverName("Vikram Reddy");
+        maintenance1.setCapacity(5000);
+        maintenance1.setIsElectric(false);
+
+        Vehicle lowBattery1 = new Vehicle("FL-006", "Delivery Van", "Mahindra Jeeto", 
+                                        Vehicle.VehicleStatus.AVAILABLE, 28.4089, 77.3178);
+        lowBattery1.setCurrentLocation("Faridabad Depot");
+        lowBattery1.setBatteryLevel(25);
+        lowBattery1.setSpeed(0.0);
+        lowBattery1.setDriverName("Ravi Gupta");
+        lowBattery1.setCapacity(750);
+        lowBattery1.setIsElectric(false);
+
+        Vehicle offline1 = new Vehicle("FL-007", "Pickup Truck", "Isuzu D-Max", 
+                                     Vehicle.VehicleStatus.OFFLINE, 28.6692, 77.4538);
+        offline1.setCurrentLocation("Ghaziabad Hub");
+        offline1.setBatteryLevel(45);
+        offline1.setSpeed(0.0);
+        offline1.setDriverName("Suresh Kumar");
+        offline1.setCapacity(1500);
+        offline1.setIsElectric(false);
         vehicleRepository.save(van1);
         vehicleRepository.save(truck1);
         vehicleRepository.save(van2);
         vehicleRepository.save(electric1);
+        vehicleRepository.save(maintenance1);
+        vehicleRepository.save(lowBattery1);
+        vehicleRepository.save(offline1);
     }
 
     private void initializeRoutes() {

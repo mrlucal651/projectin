@@ -1,5 +1,6 @@
 import React from 'react';
 import { Car, Truck, Clock, Zap, TrendingUp, MapPin, Fuel, Users } from 'lucide-react';
+import MaintenancePieChart from './MaintenancePieChart';
 
 const FleetOverview: React.FC = () => {
   const stats = [
@@ -77,6 +78,11 @@ const FleetOverview: React.FC = () => {
             <p className="text-sm text-gray-600">Average fleet efficiency up 8% this month</p>
           </div>
         </div>
+      </div>
+
+      {/* Maintenance Status Chart */}
+      <div className="mb-8">
+        <MaintenancePieChart />
       </div>
 
       {/* Vehicle List */}
