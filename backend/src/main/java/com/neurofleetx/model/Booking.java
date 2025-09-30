@@ -41,6 +41,12 @@ public class Booking {
     @NotNull
     private Double estimatedCost;
 
+    @NotNull
+    private Double loadWeight; // in kg
+
+    @NotNull
+    private LocalDateTime scheduledDate;
+
     private Integer progress = 0;
 
     @Enumerated(EnumType.STRING)
@@ -65,13 +71,15 @@ public class Booking {
     public Booking() {}
 
     public Booking(String bookingId, User customer, String pickupLocation, String deliveryLocation, 
-                   Double distance, Double estimatedCost) {
+                   Double distance, Double estimatedCost, Double loadWeight, LocalDateTime scheduledDate) {
         this.bookingId = bookingId;
         this.customer = customer;
         this.pickupLocation = pickupLocation;
         this.deliveryLocation = deliveryLocation;
         this.distance = distance;
         this.estimatedCost = estimatedCost;
+        this.loadWeight = loadWeight;
+        this.scheduledDate = scheduledDate;
     }
 
     // Getters and Setters
@@ -101,6 +109,12 @@ public class Booking {
 
     public Double getEstimatedCost() { return estimatedCost; }
     public void setEstimatedCost(Double estimatedCost) { this.estimatedCost = estimatedCost; }
+
+    public Double getLoadWeight() { return loadWeight; }
+    public void setLoadWeight(Double loadWeight) { this.loadWeight = loadWeight; }
+
+    public LocalDateTime getScheduledDate() { return scheduledDate; }
+    public void setScheduledDate(LocalDateTime scheduledDate) { this.scheduledDate = scheduledDate; }
 
     public Integer getProgress() { return progress; }
     public void setProgress(Integer progress) { this.progress = progress; }

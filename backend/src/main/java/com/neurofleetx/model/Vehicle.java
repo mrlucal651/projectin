@@ -39,6 +39,7 @@ public class Vehicle {
     private String driverName;
     private Double fuelLevel;
     private Integer capacity;
+    private Double maxLoadCapacity; // in kg
     private Boolean isElectric = false;
 
     @Column(name = "last_updated")
@@ -105,6 +106,9 @@ public class Vehicle {
 
     public Boolean getIsElectric() { return isElectric; }
     public void setIsElectric(Boolean isElectric) { this.isElectric = isElectric; }
+
+    public Double getMaxLoadCapacity() { return maxLoadCapacity; }
+    public void setMaxLoadCapacity(Double maxLoadCapacity) { this.maxLoadCapacity = maxLoadCapacity; }
 
     public LocalDateTime getLastUpdated() { return lastUpdated; }
     public void setLastUpdated(LocalDateTime lastUpdated) { this.lastUpdated = lastUpdated; }

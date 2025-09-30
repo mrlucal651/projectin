@@ -67,7 +67,12 @@ public class DataInitializer implements CommandLineRunner {
 
         // Initialize sample bookings and trips
         if (bookingRepository.count() == 0) {
-            initializeBookingsAndTrips();
+            initializeBookings();
+        }
+        
+        // Initialize sample trips
+        if (tripRepository.count() == 0) {
+            initializeTrips();
         }
     }
 
@@ -129,6 +134,7 @@ public class DataInitializer implements CommandLineRunner {
         van1.setSpeed(45.0);
         van1.setDriverName("Rajesh Kumar");
         van1.setCapacity(1500);
+        van1.setMaxLoadCapacity(1200.0);
         van1.setIsElectric(false);
 
         Vehicle truck1 = new Vehicle("FL-002", "Cargo Truck", "Ashok Leyland", 
@@ -139,6 +145,7 @@ public class DataInitializer implements CommandLineRunner {
         truck1.setSpeed(0.0);
         truck1.setDriverName("Priya Sharma");
         truck1.setCapacity(3000);
+        truck1.setMaxLoadCapacity(2500.0);
         truck1.setIsElectric(false);
 
         Vehicle van2 = new Vehicle("FL-003", "Pickup Truck", "Mahindra Bolero", 
@@ -149,6 +156,7 @@ public class DataInitializer implements CommandLineRunner {
         van2.setSpeed(0.0);
         van2.setDriverName("Amit Singh");
         van2.setCapacity(1000);
+        van2.setMaxLoadCapacity(800.0);
         van2.setIsElectric(false);
 
         Vehicle electric1 = new Vehicle("FL-004", "Electric Van", "Tata Nexon EV", 
@@ -159,6 +167,7 @@ public class DataInitializer implements CommandLineRunner {
         electric1.setSpeed(32.0);
         electric1.setDriverName("Sneha Patel");
         electric1.setCapacity(1200);
+        electric1.setMaxLoadCapacity(1000.0);
         electric1.setIsElectric(true);
 
         // Add more vehicles for better maintenance status distribution
@@ -169,6 +178,7 @@ public class DataInitializer implements CommandLineRunner {
         maintenance1.setSpeed(0.0);
         maintenance1.setDriverName("Vikram Reddy");
         maintenance1.setCapacity(5000);
+        maintenance1.setMaxLoadCapacity(4000.0);
         maintenance1.setIsElectric(false);
 
         Vehicle lowBattery1 = new Vehicle("FL-006", "Delivery Van", "Mahindra Jeeto", 
@@ -178,6 +188,7 @@ public class DataInitializer implements CommandLineRunner {
         lowBattery1.setSpeed(0.0);
         lowBattery1.setDriverName("Ravi Gupta");
         lowBattery1.setCapacity(750);
+        lowBattery1.setMaxLoadCapacity(600.0);
         lowBattery1.setIsElectric(false);
 
         Vehicle offline1 = new Vehicle("FL-007", "Pickup Truck", "Isuzu D-Max", 
@@ -187,6 +198,7 @@ public class DataInitializer implements CommandLineRunner {
         offline1.setSpeed(0.0);
         offline1.setDriverName("Suresh Kumar");
         offline1.setCapacity(1500);
+        offline1.setMaxLoadCapacity(1200.0);
         offline1.setIsElectric(false);
         vehicleRepository.save(van1);
         vehicleRepository.save(truck1);
@@ -221,27 +233,59 @@ public class DataInitializer implements CommandLineRunner {
         routeRepository.save(route3);
     }
 
-    private void initializeBookingsAndTrips() {
+    private void initializeBookings() {
         User customer = userRepository.findByEmail("customer@techsolutions.com").orElse(null);
+        User customer2 = userRepository.findByEmail("jane@logistics.com").orElse(null);
         User driver = userRepository.findByEmail("driver@neurofleetx.com").orElse(null);
         Vehicle vehicle = vehicleRepository.findByVehicleId("FL-001").orElse(null);
+        Vehicle vehicle2 = vehicleRepository.findByVehicleId("FL-002").orElse(null);
 
         if (customer != null && driver != null && vehicle != null) {
             // Sample Booking
             Booking booking1 = new Booking("BK-001", customer, "Delhi Central Warehouse", 
-                                         "Connaught Place Hub", 18.5, 1500.0);
+                                         "Connaught Place Hub", 18.5, 1500.0, 500.0, LocalDateTime.now().plusHours(2));
             booking1.setDriver(driver);
             booking1.setVehicle(vehicle);
             booking1.setStatus(Booking.BookingStatus.IN_TRANSIT);
             booking1.setProgress(65);
             booking1.setPickupTime(LocalDateTime.now().minusHours(1));
             booking1.setEstimatedDelivery(LocalDateTime.now().plusMinutes(25));
+            booking1.setNotes("Fragile items - handle with care");
             bookingRepository.save(booking1);
+        }
+        
+        if (customer2 != null && vehicle2 != null) {
+            // Sample Booking 2
+            Booking booking2 = new Booking("BK-002", customer2, "Gurgaon Distribution Center", 
+                                         "DLF Mall", 25.2, 2200.0, 1200.0, LocalDateTime.now().plusDays(1));
+            booking2.setStatus(Booking.BookingStatus.SCHEDULED);
+            booking2.setEstimatedDelivery(LocalDateTime.now().plusDays(1).plusHours(2));
+            booking2.setNotes("Bulk delivery - multiple packages");
+            bookingRepository.save(booking2);
+            
+            // Sample Booking 3 - Completed
+            Booking booking3 = new Booking("BK-003", customer, "Noida Depot", 
+                                         "Greater Noida Tech Park", 32.8, 2800.0, 800.0, LocalDateTime.now().minusDays(1));
+            booking3.setStatus(Booking.BookingStatus.DELIVERED);
+            booking3.setProgress(100);
+            booking3.setPickupTime(LocalDateTime.now().minusDays(1));
+            booking3.setDeliveryTime(LocalDateTime.now().minusDays(1).plusHours(2));
+            booking3.setRating(5);
+            booking3.setNotes("Express delivery completed successfully");
+            bookingRepository.save(booking3);
+        }
+    }
+    
+    private void initializeTrips() {
+        User driver = userRepository.findByEmail("driver@neurofleetx.com").orElse(null);
+        Vehicle vehicle = vehicleRepository.findByVehicleId("FL-001").orElse(null);
+        Booking booking = bookingRepository.findByBookingId("BK-001").orElse(null);
 
+        if (driver != null && vehicle != null && booking != null) {
             // Sample Trip
             Trip trip1 = new Trip("TR-001", driver, vehicle, "Delhi Central Warehouse", 
                                 "Connaught Place Hub", 18.5, 850.0);
-            trip1.setBooking(booking1);
+            trip1.setBooking(booking);
             trip1.setStatus(Trip.TripStatus.IN_PROGRESS);
             trip1.setProgress(65);
             trip1.setStartTime(LocalDateTime.now().minusHours(1));
