@@ -4,6 +4,7 @@ import com.neurofleetx.model.Vehicle;
 import com.neurofleetx.service.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
@@ -17,16 +18,19 @@ public class VehicleController {
     @Autowired
     private VehicleService vehicleService;
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     @GetMapping
     public ResponseEntity<List<Vehicle>> getAllVehicles() {
         return ResponseEntity.ok(vehicleService.getAllVehicles());
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     @GetMapping("/active")
     public ResponseEntity<List<Vehicle>> getActiveVehicles() {
         return ResponseEntity.ok(vehicleService.getActiveVehicles());
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     @GetMapping("/{id}")
     public ResponseEntity<Vehicle> getVehicleById(@PathVariable Long id) {
         return vehicleService.getVehicleById(id)
@@ -34,6 +38,7 @@ public class VehicleController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     @GetMapping("/vehicle/{vehicleId}")
     public ResponseEntity<Vehicle> getVehicleByVehicleId(@PathVariable String vehicleId) {
         return vehicleService.getVehicleByVehicleId(vehicleId)
@@ -41,12 +46,14 @@ public class VehicleController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     @PostMapping
     public ResponseEntity<Vehicle> createVehicle(@RequestBody Vehicle vehicle) {
         Vehicle savedVehicle = vehicleService.createVehicle(vehicle);
         return ResponseEntity.ok(savedVehicle);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     @PutMapping("/{id}")
     public ResponseEntity<Vehicle> updateVehicle(@PathVariable Long id, @RequestBody Vehicle vehicleDetails) {
         return vehicleService.getVehicleById(id)
@@ -66,6 +73,7 @@ public class VehicleController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER') or hasRole('DRIVER')")
     @PutMapping("/{vehicleId}/location")
     public ResponseEntity<Vehicle> updateVehicleLocation(
             @PathVariable String vehicleId,
@@ -82,6 +90,7 @@ public class VehicleController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Object>> getVehicleStats() {
         Map<String, Object> stats = Map.of(
@@ -93,6 +102,7 @@ public class VehicleController {
         return ResponseEntity.ok(stats);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     @GetMapping("/maintenance-status")
     public ResponseEntity<Map<String, Integer>> getMaintenanceStatus() {
         List<Vehicle> allVehicles = vehicleService.getAllVehicles();
@@ -122,6 +132,7 @@ public class VehicleController {
         return ResponseEntity.ok(maintenanceStatus);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteVehicle(@PathVariable Long id) {
         return vehicleService.getVehicleById(id)

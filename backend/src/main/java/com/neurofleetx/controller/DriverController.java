@@ -6,6 +6,7 @@ import com.neurofleetx.service.TripService;
 import com.neurofleetx.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -23,12 +24,14 @@ public class DriverController {
     @Autowired
     private UserService userService;
 
+    @PreAuthorize("hasRole('DRIVER')")
     @GetMapping("/trips")
     public ResponseEntity<List<Trip>> getMyTrips(Authentication authentication) {
         User driver = userService.findByEmail(authentication.getName()).orElseThrow();
         return ResponseEntity.ok(tripService.getTripsByDriver(driver));
     }
 
+    @PreAuthorize("hasRole('DRIVER')")
     @GetMapping("/trips/current")
     public ResponseEntity<Trip> getCurrentTrip(Authentication authentication) {
         User driver = userService.findByEmail(authentication.getName()).orElseThrow();
@@ -37,12 +40,14 @@ public class DriverController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasRole('DRIVER')")
     @GetMapping("/trips/upcoming")
     public ResponseEntity<List<Trip>> getUpcomingTrips(Authentication authentication) {
         User driver = userService.findByEmail(authentication.getName()).orElseThrow();
         return ResponseEntity.ok(tripService.getUpcomingTripsByDriver(driver));
     }
 
+    @PreAuthorize("hasRole('DRIVER')")
     @GetMapping("/trips/{tripId}")
     public ResponseEntity<Trip> getTripDetails(@PathVariable String tripId) {
         return tripService.getTripByTripId(tripId)
@@ -50,6 +55,7 @@ public class DriverController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasRole('DRIVER')")
     @PutMapping("/trips/{tripId}/progress")
     public ResponseEntity<Trip> updateTripProgress(
             @PathVariable String tripId,
@@ -63,6 +69,7 @@ public class DriverController {
         }
     }
 
+    @PreAuthorize("hasRole('DRIVER')")
     @PutMapping("/trips/{tripId}/complete")
     public ResponseEntity<Trip> completeTrip(@PathVariable String tripId) {
         return tripService.getTripByTripId(tripId)
@@ -74,6 +81,7 @@ public class DriverController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasRole('DRIVER')")
     @GetMapping("/dashboard/stats")
     public ResponseEntity<Map<String, Object>> getDriverStats(Authentication authentication) {
         User driver = userService.findByEmail(authentication.getName()).orElseThrow();
@@ -106,6 +114,7 @@ public class DriverController {
         return ResponseEntity.ok(stats);
     }
 
+    @PreAuthorize("hasRole('DRIVER')")
     @GetMapping("/earnings/monthly")
     public ResponseEntity<Double> getMonthlyEarnings(Authentication authentication) {
         User driver = userService.findByEmail(authentication.getName()).orElseThrow();

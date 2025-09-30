@@ -4,6 +4,7 @@ import com.neurofleetx.service.VehicleService;
 import com.neurofleetx.service.RouteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +20,7 @@ public class DashboardController {
     @Autowired
     private RouteService routeService;
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Object>> getDashboardStats() {
         Map<String, Object> stats = new HashMap<>();
@@ -43,6 +45,7 @@ public class DashboardController {
         return ResponseEntity.ok(stats);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     @GetMapping("/insights")
     public ResponseEntity<Map<String, Object>> getAIInsights() {
         Map<String, Object> insights = new HashMap<>();

@@ -3,11 +3,13 @@ package com.neurofleetx.config;
 import com.neurofleetx.model.Route;
 import com.neurofleetx.model.Vehicle;
 import com.neurofleetx.model.User;
+import com.neurofleetx.model.Role;
 import com.neurofleetx.model.Booking;
 import com.neurofleetx.model.Trip;
 import com.neurofleetx.repository.RouteRepository;
 import com.neurofleetx.repository.VehicleRepository;
 import com.neurofleetx.repository.UserRepository;
+import com.neurofleetx.repository.RoleRepository;
 import com.neurofleetx.repository.BookingRepository;
 import com.neurofleetx.repository.TripRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
@@ -29,6 +32,9 @@ public class DataInitializer implements CommandLineRunner {
     private UserRepository userRepository;
 
     @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
     private BookingRepository bookingRepository;
 
     @Autowired
@@ -39,6 +45,11 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        // Initialize roles first
+        if (roleRepository.count() == 0) {
+            initializeRoles();
+        }
+
         // Initialize sample users if database is empty
         if (userRepository.count() == 0) {
             initializeUsers();
@@ -60,22 +71,53 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 
+    private void initializeRoles() {
+        roleRepository.save(new Role(Role.ERole.ROLE_ADMIN));
+        roleRepository.save(new Role(Role.ERole.ROLE_MANAGER));
+        roleRepository.save(new Role(Role.ERole.ROLE_DRIVER));
+        roleRepository.save(new Role(Role.ERole.ROLE_CUSTOMER));
+    }
+
     private void initializeUsers() {
+        Role adminRole = roleRepository.findByName(Role.ERole.ROLE_ADMIN).orElseThrow();
+        Role managerRole = roleRepository.findByName(Role.ERole.ROLE_MANAGER).orElseThrow();
+        Role driverRole = roleRepository.findByName(Role.ERole.ROLE_DRIVER).orElseThrow();
+        Role customerRole = roleRepository.findByName(Role.ERole.ROLE_CUSTOMER).orElseThrow();
+
         // Fleet Manager
-        User fleetManager = new User("Admin", "Manager", "admin@neurofleetx.com", 
+        User admin = new User("Super", "Admin", "admin@neurofleetx.com", 
+                             "NeuroFleetX Corp", passwordEncoder.encode("password123"), "admin");
+        admin.setRoles(Set.of(adminRole));
+        userRepository.save(admin);
+
+        // Manager
+        User manager = new User("Fleet", "Manager", "manager@neurofleetx.com", 
                                    "NeuroFleetX Corp", passwordEncoder.encode("password123"), "fleet_manager");
-        fleetManager.setRole(User.Role.ADMIN);
-        userRepository.save(fleetManager);
+        manager.setRoles(Set.of(managerRole));
+        userRepository.save(manager);
 
         // Customer
         User customer = new User("John", "Doe", "customer@techsolutions.com", 
                                "Tech Solutions Ltd", passwordEncoder.encode("password123"), "customer");
+        customer.setRoles(Set.of(customerRole));
         userRepository.save(customer);
 
         // Driver
         User driver = new User("Rajesh", "Kumar", "driver@neurofleetx.com", 
                              "NeuroFleetX Corp", passwordEncoder.encode("password123"), "driver");
+        driver.setRoles(Set.of(driverRole));
         userRepository.save(driver);
+
+        // Additional test users
+        User customer2 = new User("Jane", "Smith", "jane@logistics.com", 
+                                "Logistics Inc", passwordEncoder.encode("password123"), "customer");
+        customer2.setRoles(Set.of(customerRole));
+        userRepository.save(customer2);
+
+        User driver2 = new User("Priya", "Sharma", "priya@neurofleetx.com", 
+                              "NeuroFleetX Corp", passwordEncoder.encode("password123"), "driver");
+        driver2.setRoles(Set.of(driverRole));
+        userRepository.save(driver2);
     }
 
     private void initializeVehicles() {

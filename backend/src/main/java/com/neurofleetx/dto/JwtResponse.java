@@ -1,5 +1,7 @@
 package com.neurofleetx.dto;
 
+import java.util.List;
+
 public class JwtResponse {
     private String token;
     private String type = "Bearer";
@@ -9,8 +11,9 @@ public class JwtResponse {
     private String lastName;
     private String company;
     private String userType;
+    private List<String> roles;
 
-    public JwtResponse(String accessToken, Long id, String email, String firstName, String lastName, String company, String userType) {
+    public JwtResponse(String accessToken, Long id, String email, String firstName, String lastName, String company, String userType, List<String> roles) {
         this.token = accessToken;
         this.id = id;
         this.email = email;
@@ -18,6 +21,7 @@ public class JwtResponse {
         this.lastName = lastName;
         this.company = company;
         this.userType = userType;
+        this.roles = roles;
     }
 
     // Getters and Setters
@@ -44,4 +48,7 @@ public class JwtResponse {
 
     public String getUserType() { return userType; }
     public void setUserType(String userType) { this.userType = userType; }
+
+    public List<String> getRoles() { return roles; }
+    public void setRoles(List<String> roles) { this.roles = roles; }
 }

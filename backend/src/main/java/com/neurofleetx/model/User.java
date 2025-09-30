@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -40,8 +41,11 @@ public class User {
     @Size(max = 20)
     private String userType; // customer, driver, fleet_manager
 
-    @Enumerated(EnumType.STRING)
-    private Role role = Role.USER;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_roles",
+               joinColumns = @JoinColumn(name = "user_id"),
+               inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -83,8 +87,8 @@ public class User {
     public String getUserType() { return userType; }
     public void setUserType(String userType) { this.userType = userType; }
 
-    public Role getRole() { return role; }
-    public void setRole(Role role) { this.role = role; }
+    public Set<Role> getRoles() { return roles; }
+    public void setRoles(Set<Role> roles) { this.roles = roles; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
@@ -92,7 +96,4 @@ public class User {
     public LocalDateTime getLastLogin() { return lastLogin; }
     public void setLastLogin(LocalDateTime lastLogin) { this.lastLogin = lastLogin; }
 
-    public enum Role {
-        USER, ADMIN, FLEET_MANAGER
-    }
 }

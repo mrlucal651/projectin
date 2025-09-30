@@ -6,6 +6,7 @@ import com.neurofleetx.service.BookingService;
 import com.neurofleetx.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -22,12 +23,14 @@ public class CustomerController {
     @Autowired
     private UserService userService;
 
+    @PreAuthorize("hasRole('CUSTOMER')")
     @GetMapping("/bookings")
     public ResponseEntity<List<Booking>> getMyBookings(Authentication authentication) {
         User customer = userService.findByEmail(authentication.getName()).orElseThrow();
         return ResponseEntity.ok(bookingService.getBookingsByCustomer(customer));
     }
 
+    @PreAuthorize("hasRole('CUSTOMER')")
     @GetMapping("/bookings/{bookingId}")
     public ResponseEntity<Booking> getBookingDetails(@PathVariable String bookingId) {
         return bookingService.getBookingByBookingId(bookingId)
@@ -35,6 +38,7 @@ public class CustomerController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping("/bookings")
     public ResponseEntity<Booking> createBooking(@RequestBody Booking booking, Authentication authentication) {
         User customer = userService.findByEmail(authentication.getName()).orElseThrow();
@@ -43,6 +47,7 @@ public class CustomerController {
         return ResponseEntity.ok(savedBooking);
     }
 
+    @PreAuthorize("hasRole('CUSTOMER')")
     @PutMapping("/bookings/{bookingId}/progress")
     public ResponseEntity<Booking> updateBookingProgress(
             @PathVariable String bookingId,
@@ -56,6 +61,7 @@ public class CustomerController {
         }
     }
 
+    @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping("/bookings/{bookingId}/rate")
     public ResponseEntity<Booking> rateBooking(
             @PathVariable String bookingId,
@@ -68,6 +74,7 @@ public class CustomerController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasRole('CUSTOMER')")
     @GetMapping("/dashboard/stats")
     public ResponseEntity<Map<String, Object>> getCustomerStats(Authentication authentication) {
         User customer = userService.findByEmail(authentication.getName()).orElseThrow();
