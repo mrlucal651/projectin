@@ -12,6 +12,8 @@ import com.neurofleetx.repository.UserRepository;
 import com.neurofleetx.repository.RoleRepository;
 import com.neurofleetx.repository.BookingRepository;
 import com.neurofleetx.repository.TripRepository;
+import com.neurofleetx.repository.MaintenanceLogRepository;
+import com.neurofleetx.repository.VehicleHealthMetricsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,6 +41,12 @@ public class DataInitializer implements CommandLineRunner {
 
     @Autowired
     private TripRepository tripRepository;
+
+    @Autowired
+    private MaintenanceLogRepository maintenanceLogRepository;
+
+    @Autowired
+    private VehicleHealthMetricsRepository healthMetricsRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -77,6 +85,11 @@ public class DataInitializer implements CommandLineRunner {
         
         // Initialize sample optimization data
         initializeOptimizationData();
+        
+        // Initialize maintenance and health data
+        if (maintenanceLogRepository.count() == 0) {
+            initializeMaintenanceData();
+        }
     }
 
     private void initializeRoles() {
@@ -323,6 +336,60 @@ public class DataInitializer implements CommandLineRunner {
                 booking.setStatus(Booking.BookingStatus.SCHEDULED);
                 booking.setEstimatedDelivery(booking.getScheduledDate().plusHours(2));
                 bookingRepository.save(booking);
+            }
+        }
+    }
+    
+    private void initializeMaintenanceData() {
+        List<Vehicle> vehicles = vehicleRepository.findAll();
+        
+        for (Vehicle vehicle : vehicles) {
+            // Create vehicle health metrics
+            VehicleHealthMetrics metrics = new VehicleHealthMetrics(vehicle);
+            
+            // Set realistic health metrics based on vehicle status
+            if (vehicle.getStatus() == Vehicle.VehicleStatus.MAINTENANCE) {
+                // Poor health for maintenance vehicles
+                metrics.setEngineTemperature(105.0); // High temperature
+                metrics.setOilPressure(15.0); // Low oil pressure
+                metrics.setOverallHealthScore(45.0);
+                metrics.setHealthStatus(VehicleHealthMetrics.HealthStatus.POOR);
+            } else if (vehicle.getBatteryLevel() != null && vehicle.getBatteryLevel() < 30) {
+                // Fair health for low battery vehicles
+                metrics.setEngineTemperature(88.0);
+                metrics.setOilPressure(28.0);
+                metrics.setOverallHealthScore(65.0);
+                metrics.setHealthStatus(VehicleHealthMetrics.HealthStatus.FAIR);
+            } else {
+                // Good health for active vehicles
+                metrics.setEngineTemperature(85.0);
+                metrics.setOilPressure(35.0);
+                metrics.setOverallHealthScore(88.0);
+                metrics.setHealthStatus(VehicleHealthMetrics.HealthStatus.GOOD);
+            }
+            
+            // Set common metrics
+            metrics.setFrontLeftTirePressure(33.0);
+            metrics.setFrontRightTirePressure(32.5);
+            metrics.setRearLeftTirePressure(33.5);
+            metrics.setRearRightTirePressure(33.0);
+            metrics.setFuelLevel(vehicle.getFuelLevel() != null ? vehicle.getFuelLevel() : 75.0);
+            metrics.setBatteryVoltage(12.6);
+            metrics.setTransmissionTemperature(75.0);
+            metrics.setBrakeFluidLevel(85.0);
+            metrics.setVibrationLevel(0.5);
+            metrics.setMileage(50000 + (int)(Math.random() * 100000));
+            metrics.setCoolantLevel(80.0);
+            
+            healthMetricsRepository.save(metrics);
+            
+            // Create sample maintenance logs for vehicles with issues
+            if (vehicle.getStatus() == Vehicle.VehicleStatus.MAINTENANCE) {
+                MaintenanceLog log = new MaintenanceLog(vehicle, MaintenanceLog.MetricType.ENGINE_TEMPERATURE, 105.0);
+                log.setAlert(true);
+                log.setAlertSeverity(MaintenanceLog.AlertSeverity.HIGH);
+                log.setAlertMessage("Engine temperature critical: 105.0°C");
+                maintenanceLogRepository.save(log);
             }
         }
     }
