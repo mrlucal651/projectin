@@ -74,6 +74,9 @@ public class DataInitializer implements CommandLineRunner {
         if (tripRepository.count() == 0) {
             initializeTrips();
         }
+        
+        // Initialize sample optimization data
+        initializeOptimizationData();
     }
 
     private void initializeRoles() {
@@ -293,6 +296,34 @@ public class DataInitializer implements CommandLineRunner {
             trip1.setCustomerName("John Doe");
             trip1.setCustomerPhone("+91 98765 43210");
             tripRepository.save(trip1);
+        }
+    }
+    
+    private void initializeOptimizationData() {
+        // Create additional bookings for optimization demonstration
+        User customer = userRepository.findByEmail("customer@techsolutions.com").orElse(null);
+        User customer2 = userRepository.findByEmail("jane@logistics.com").orElse(null);
+        
+        if (customer != null && customer2 != null) {
+            // Batch of bookings for route optimization
+            List<Booking> optimizationBookings = Arrays.asList(
+                new Booking("BK-OPT-001", customer, "Delhi Central Hub", "Gurgaon Tech Park", 
+                           28.5, 2100.0, 800.0, LocalDateTime.now().plusHours(4)),
+                new Booking("BK-OPT-002", customer2, "Delhi Warehouse", "Noida Sector 18", 
+                           32.1, 2400.0, 1200.0, LocalDateTime.now().plusHours(5)),
+                new Booking("BK-OPT-003", customer, "Gurgaon Distribution", "Delhi Airport", 
+                           24.8, 1800.0, 600.0, LocalDateTime.now().plusHours(6)),
+                new Booking("BK-OPT-004", customer2, "Noida Depot", "Greater Noida Mall", 
+                           18.2, 1500.0, 400.0, LocalDateTime.now().plusHours(7)),
+                new Booking("BK-OPT-005", customer, "Delhi South", "Faridabad Industrial", 
+                           35.6, 2800.0, 1500.0, LocalDateTime.now().plusHours(8))
+            );
+            
+            for (Booking booking : optimizationBookings) {
+                booking.setStatus(Booking.BookingStatus.SCHEDULED);
+                booking.setEstimatedDelivery(booking.getScheduledDate().plusHours(2));
+                bookingRepository.save(booking);
+            }
         }
     }
 }
